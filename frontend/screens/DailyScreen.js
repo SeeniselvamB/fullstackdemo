@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, Modal,TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+
+
 
 export default function DailyScreen() {
   const [hours, setHours] = useState('');
@@ -7,40 +9,88 @@ export default function DailyScreen() {
   const [salary, setSalary] = useState(null);
 
   const calculateSalary = () => {
-    const h = parseFloat(hours);
-    const r = parseFloat(rate);
+  if (!hours || !rate) {
+    Alert.alert('Invalid Input', 'Please enter both hours and rate.');
+    return;
+  }
 
-    if (!h || !r || h <= 0 || r <= 0) {
-      Alert.alert('Invalid Input', 'Please enter positive numbers only.');
-      return;
-    }
+  const parts = hours.split('.');
+  const hourPart = parseInt(parts[0]) || 0;
+  const minutePart = parts[1] ? parseInt(parts[1]) : 0;
 
-    const daily = h * r;
-    setSalary({ amount: daily, hours: h, rate: r });
-  };
+  if (minutePart >= 60) {
+    Alert.alert('Invalid Minutes', 'Minutes must be less than 60.');
+    return;
+  }
+
+  const totalHours = hourPart + minutePart / 60;
+  const r = parseFloat(rate);
+
+  if (totalHours <= 0 || totalHours > 24 || isNaN(r) || r <= 0) {
+    Alert.alert('Invalid Input', 'Enter valid numbers for hours and rate.');
+    return;
+  }
+
+  const daily = totalHours * r;
+  setSalary({ amount: daily, hours: totalHours.toFixed(2), rate: r });
+};
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🕒 Daily Salary Calculator</Text>
+      <Text style={styles.title}>Daily Salary Calculator</Text>
 
       <View style={styles.card}>
+       <TextInput
+  style={styles.input}
+  placeholder="Enter Hours Worked Today"
+  keyboardType="decimal-pad"
+  value={hours}
+  onChangeText={(text) => {
+    if (/^\d{0,2}(\.\d{0,2})?$/.test(text)) {
+      if (text === '' || text === '.' || text === '0.') {
+        setHours(text);
+        return;
+      }
+
+      const parts = text.split('.');
+      const hourPart = parseInt(parts[0]) || 0;
+      const minutePart = parts[1] ? parseInt(parts[1]) : 0;
+
+      if (minutePart >= 60) {
+        Alert.alert('Invalid Minutes', 'Minutes must be less than 60');
+        return;
+      }
+
+      const totalHours = hourPart + minutePart / 60;
+
+      if (totalHours >= 0 && totalHours <= 24) {
+        setHours(text);
+      } else {
+        Alert.alert('Invalid Input', 'Enter time between 0 and 24 hours');
+      }
+    }
+  }}
+/>
+
+
+
         <TextInput
           style={styles.input}
-          placeholder="💼 Enter Hours Worked Today"
-          keyboardType="numeric"
-          value={hours}
-          onChangeText={setHours}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="💰 Enter Hourly Rate"
-          keyboardType="numeric"
+          placeholder="Enter Hourly Rate"
+          keyboardType="decimal-pad"
           value={rate}
           onChangeText={setRate}
         />
         <TouchableOpacity style={styles.button} onPress={calculateSalary}>
           <Text style={styles.buttonText}>Calculate</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.resetButton} onPress={() => {
+  setHours('');
+  setRate('');
+  setSalary(null);
+}}>
+  <Text style={styles.resetText}>Reset</Text>
+</TouchableOpacity>
 
         {salary && (
           <View style={styles.result}>
@@ -111,4 +161,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+  resetButton: {
+  backgroundColor: '#e74c3c',
+  paddingVertical: 14,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginBottom: 10,
+},
+resetText: {
+  color: '#fff',
+  fontSize: 17,
+  fontWeight: 'bold',
+},
+
 });

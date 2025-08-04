@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity,Modal, StyleSheet } from 'react-native';
+
+
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📊 Salary Calculator</Text>
+      <Text style={styles.title}>Salary Calculator</Text>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Daily')}>
         <Text style={styles.buttonText}>Daily Hours</Text>
