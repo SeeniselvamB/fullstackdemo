@@ -14,6 +14,7 @@ public class SalaryEntry {
     private String outTime;
     private double totalHours;
     private double salary;
+    private boolean isLeave; // <-- Add this field
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -33,4 +34,7 @@ public class SalaryEntry {
 
     public double getSalary() { return salary; }
     public void setSalary(double salary) { this.salary = salary; }
+
+    public boolean isLeave() { return isLeave; }
+    public void setLeave(boolean isLeave) { this.isLeave = isLeave; }
 }

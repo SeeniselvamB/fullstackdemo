@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect,useState } from 'react';
 import {
   View,
   Text,
@@ -11,11 +11,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import { saveToBackend, loadFromBackend } from '../utils/backendHelper';
+import { deleteAllWeeklyEntries } from '../utils/backendHelper';
+import { recalculateEntries } from '../utils/calculateUtils';
+// import { formatWeeklyEntriesWithDefaultPM } from '../utils/formatHelper';
 
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function WeeklyScreen() {
+  
+
   const [rate, setRate] = useState('10');
   const [timeEntries, setTimeEntries] = useState(
     days.map(() => ({
@@ -28,8 +34,30 @@ export default function WeeklyScreen() {
       isLeave: true,
     }))
   );
+  
+
   const [result, setResult] = useState(null);
 const [showHelp, setShowHelp] = useState(false);
+useEffect(() => {
+  loadFromBackend(setTimeEntries); // ✅ Pass correct setter function
+}, []);
+useEffect(() => {
+  const parsedRate = parseFloat(rate);
+  const updated = recalculateEntries(timeEntries, parsedRate);
+  setTimeEntries(updated);
+}, [rate]);
+
+
+useEffect(() => {
+  loadFromBackend((backendData) => {
+    const formattedData = formatWeeklyEntriesWithDefaultPM(backendData);
+    setTimeEntries(formattedData);
+  });
+}, []);
+
+
+
+
   const convertToDecimalHours = (timeStr, ampm) => {
     if (!/^\d{1,2}(\.\d{0,2})?$/.test(timeStr)) return null;
     const [h, m = '0'] = timeStr.split('.');
@@ -84,6 +112,7 @@ const [showHelp, setShowHelp] = useState(false);
 
     setTimeEntries(updated);
   };
+  
 
   const calculateWeeklySalary = () => {
     const validEntries = timeEntries.filter(
@@ -113,21 +142,32 @@ const [showHelp, setShowHelp] = useState(false);
     });
   };
 
-  const resetAll = () => {
-    setRate('10');
-    setTimeEntries(
-      days.map(() => ({
-        inTime: '',
-        inAmPm: 'AM',
-        outTime: '',
-        outAmPm: 'PM',
-        hours: '-',
-        salary: '',
-        isLeave: true,
-      }))
-    );
-    setResult(null);
-  };
+  const handleReset = async () => {
+  setRate('10');
+  setTimeEntries(
+    days.map(() => ({
+      inTime: '',
+      inAmPm: 'AM',
+      outTime: '',
+      outAmPm: 'PM',
+      hours: '-',
+      salary: '',
+      isLeave: true,
+    }))
+  );
+  setResult(null);
+
+  try {
+    // await deleteAllWeeklyEntries();
+    await deleteAllWeeklyEntries(setTimeEntries);
+    console.log('Backend entries cleared!');
+  } catch (error) {
+    console.error('Error deleting entries:', error);
+    Alert.alert('Error', 'Failed to delete entries from backend.');
+  }
+};
+
+
 
   return (
     <ScrollView style={styles.container}>
@@ -237,7 +277,7 @@ const [showHelp, setShowHelp] = useState(false);
       <View style={styles.buttonContainer}>
         <Button title="Calculate" onPress={calculateWeeklySalary} color="#4CAF50" />
         <View style={{ height: 10 }} />
-        <Button title="Reset" onPress={resetAll} color="#f44336" />
+        <Button title="Reset" onPress={handleReset} color="#f44336" />
       </View>
 
       {result && (
@@ -269,6 +309,12 @@ const [showHelp, setShowHelp] = useState(false);
           </View>
         </View>
       </Modal>
+      <Button
+  title="Save"
+  onPress={() => saveToBackend(timeEntries)}
+  color="#2196F3"
+/>
+
     </ScrollView>
   );
 }
