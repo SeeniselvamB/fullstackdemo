@@ -32,6 +32,7 @@ export default function WeeklyScreen() {
       hours: '-',
       salary: '',
       isLeave: true,
+      rate: '',
     }))
   );
   
@@ -39,7 +40,7 @@ export default function WeeklyScreen() {
   const [result, setResult] = useState(null);
 const [showHelp, setShowHelp] = useState(false);
 useEffect(() => {
-  loadFromBackend(setTimeEntries); // ✅ Pass correct setter function
+  loadFromBackend(setTimeEntries,setRate); // ✅ Pass correct setter function
 }, []);
 useEffect(() => {
   const parsedRate = parseFloat(rate);
@@ -54,6 +55,7 @@ useEffect(() => {
     setTimeEntries(formattedData);
   });
 }, []);
+
 
 
 
@@ -311,7 +313,7 @@ useEffect(() => {
       </Modal>
       <Button
   title="Save"
-  onPress={() => saveToBackend(timeEntries)}
+  onPress={() => saveToBackend(timeEntries, rate)}
   color="#2196F3"
 />
 

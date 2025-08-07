@@ -21,10 +21,16 @@ public class SalaryEntryController {
     // public SalaryEntry createSalaryEntry(@RequestBody SalaryEntry entry) {
     //     return salaryEntryService.createSalaryEntry(entry);
     // }
+    // @PostMapping
+    // public SalaryEntry createOrUpdateSalaryEntry(@RequestBody SalaryEntry entry) {
+    //     return salaryEntryService.createOrUpdateSalaryEntry(entry); // ✅ Updated
+    // }
     @PostMapping
-    public SalaryEntry createOrUpdateSalaryEntry(@RequestBody SalaryEntry entry) {
-        return salaryEntryService.createOrUpdateSalaryEntry(entry); // ✅ Updated
-    }
+public ResponseEntity<SalaryEntry> createOrUpdateSalaryEntry(@RequestBody SalaryEntry entry) {
+    SalaryEntry saved = salaryEntryService.createOrUpdateSalaryEntry(entry);
+    return ResponseEntity.ok(saved); // Or .created(location).body(saved) if you're tracking URI
+}
+
 
     @GetMapping
     public List<SalaryEntry> getAllSalaryEntries() {

@@ -37,4 +37,33 @@ public class SalaryEntry {
 
     public boolean isLeave() { return isLeave; }
     public void setLeave(boolean isLeave) { this.isLeave = isLeave; }
+   @Column
+private double rate;
+
+public double getRate() { return rate; }
+public void setRate(double rate) { this.rate = rate; }
+
+@Column
+private String inAmPm;
+
+@Column
+private String outAmPm;
+
+public String getInAmPm() {
+    return inAmPm;
+}
+
+public void setInAmPm(String inAmPm) {
+    this.inAmPm = inAmPm;
+}
+
+public String getOutAmPm() {
+    return outAmPm;
+}
+
+public void setOutAmPm(String outAmPm) {
+    this.outAmPm = outAmPm;
+}
+
+
 }
