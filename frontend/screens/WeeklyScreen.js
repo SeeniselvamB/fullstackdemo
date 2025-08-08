@@ -15,6 +15,7 @@ import { saveToBackend, loadFromBackend } from '../utils/backendHelper';
 import { deleteAllWeeklyEntries } from '../utils/backendHelper';
 import { recalculateEntries } from '../utils/calculateUtils';
 // import { formatWeeklyEntriesWithDefaultPM } from '../utils/formatHelper';
+import { restoreSalariesFromBackend } from '../utils/salaryRestore';
 
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -42,12 +43,19 @@ const [showHelp, setShowHelp] = useState(false);
 useEffect(() => {
   loadFromBackend(setTimeEntries,setRate); // ✅ Pass correct setter function
 }, []);
-useEffect(() => {
-  const parsedRate = parseFloat(rate);
-  const updated = recalculateEntries(timeEntries, parsedRate);
-  setTimeEntries(updated);
-}, [rate]);
+// useEffect(() => {
+//   const parsedRate = parseFloat(rate);
+//   const updated = recalculateEntries(timeEntries, parsedRate);
+//   setTimeEntries(updated);
+// }, [rate]);
 
+useEffect(() => {
+  loadFromBackend((backendData) => {
+    const formattedData = formatWeeklyEntriesWithDefaultPM(backendData);
+    const restoredData = restoreSalariesFromBackend(formattedData, rate);
+    setTimeEntries(restoredData);
+  });
+}, []);
 
 useEffect(() => {
   loadFromBackend((backendData) => {
@@ -55,9 +63,6 @@ useEffect(() => {
     setTimeEntries(formattedData);
   });
 }, []);
-
-
-
 
 
   const convertToDecimalHours = (timeStr, ampm) => {

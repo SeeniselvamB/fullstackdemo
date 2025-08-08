@@ -1,127 +1,16 @@
 import { Alert } from 'react-native';
-// const BASE_URL = 'http://172.19.21.59:8080/api/salary';
+
 // const BASE_URL = 'http://100.127.173.201:8080/api/salary';
-const BASE_URL = 'http://100.127.28.104:8080/api/salary';
+const BASE_URL = 'http://100.127.186.132:8080/api/salary';
+// const BASE_URL = 'http://172.19.74.97:8080/api/salary';
+
+// const BASE_URL = 'http://10.235.128.70:8080/api/salary';
+
 
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-/**
- * Save all weekly entries to backend
- */
-// export const saveToBackend = async (timeEntries) => {
-//   try {
-//     const entriesToSave = timeEntries.map((entry, idx) => ({
-//       day: days[idx],
-//       inTime: entry.inTime,
-//       outTime: entry.outTime,
-//       totalHours: parseFloat(entry.hours) || 0,
-//       salary: parseFloat(entry.salary) || 0,
-//       leave: entry.isLeave,
-//       rate: parseFloat(entry.rate) || 0,
-//     }));
 
-//     for (let entry of entriesToSave) {
-//       await fetch(BASE_URL, {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(entry),
-//       });
-//     }
-
-//     Alert.alert('Success', 'Weekly entries saved successfully.');
-//   } catch (error) {
-//     console.error('Save error:', error);
-//     Alert.alert('Error', 'Failed to save entries to backend.');
-//   }
-// };
-
-
-// export const loadFromBackend = async (setTimeEntries, setRate) => {
-//   try {
-//     const response = await fetch(BASE_URL);
-//     const data = await response.json();
-
-//     const updatedEntries = days.map((day) => {
-//       const entry = data.find((e) => e.day === day);
-
-//       if (entry) {
-//         const inTime = entry.inTime || '';
-//         const outTime = entry.outTime || '';
-
-//         const inAmPm =
-//           typeof inTime === 'string' && inTime.toUpperCase().includes('PM') ? 'PM' : 'AM';
-//         const outAmPm =
-//           typeof outTime === 'string' && outTime.toUpperCase().includes('PM') ? 'PM' : 'AM';
-
-//         return {
-//           inTime,
-//           inAmPm,
-//           outTime,
-//           outAmPm,
-//           hours: entry.totalHours?.toFixed(2) || '-',
-//           salary: entry.salary?.toFixed(2) || '',
-//           isLeave: entry.leave,
-//           rate: entry.rate || '', // ✅ Restore hourly rate
-//         };
-//       } else {
-//         return {
-//           inTime: '',
-//           inAmPm: 'AM',
-//           outTime: '',
-//           outAmPm: 'PM',
-//           hours: '-',
-//           salary: '',
-//           isLeave: true,
-//           rate: '',
-//         };
-//       }
-//     });
-
-//     // Set the entries in state
-//     setTimeEntries(updatedEntries);
-
-//     // ✅ Restore the first non-zero rate (or default to 0)
-//     const firstRate = data.find((e) => e.rate && e.rate > 0)?.rate || '';
-//     setRate(String(firstRate));
-
-//   } catch (error) {
-//     console.error('Load error:', error);
-//     Alert.alert('Error', 'Failed to load entries from backend.');
-//   }
-// };
-// export const saveToBackend = async (timeEntries) => {
-//   try {
-//     const entriesToSave = timeEntries.map((entry, idx) => ({
-//       day: days[idx],
-//       inTime: entry.inTime,
-//       outTime: entry.outTime,
-//       inAmPm: entry.inAmPm,       // ✅ explicitly save AM/PM
-//       outAmPm: entry.outAmPm,
-//       totalHours: parseFloat(entry.hours) || 0,
-//       salary: parseFloat(entry.salary) || 0,
-//       leave: entry.isLeave,
-//       rate: parseFloat(entry.rate) || 0,
-//     }));
-
-//     for (let entry of entriesToSave) {
-//       await fetch(BASE_URL, {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(entry),
-//       });
-//     }
-
-//     Alert.alert('Success', 'Weekly entries saved successfully.');
-//   } catch (error) {
-//     console.error('Save error:', error);
-//     Alert.alert('Error', 'Failed to save entries to backend.');
-//   }
-// };
 export const saveToBackend = async (timeEntries, hourlyRate) => {
   try {
     const entriesToSave = timeEntries.map((entry, idx) => ({
@@ -153,52 +42,6 @@ export const saveToBackend = async (timeEntries, hourlyRate) => {
   }
 };
 
-/**
- * Load saved weekly entries from backend and map to local state structure (includes AM/PM)
- */
-// export const loadFromBackend = async (setTimeEntries, setRate) => {
-//   try {
-//     const response = await fetch(BASE_URL);
-//     const data = await response.json();
-
-//     const updatedEntries = days.map((day) => {
-//       const entry = data.find((e) => e.day === day);
-
-//       if (entry) {
-//         return {
-//           inTime: entry.inTime || '',
-//           inAmPm: entry.inAmPm || 'AM',     // ✅ use saved AM/PM
-//           outTime: entry.outTime || '',
-//           outAmPm: entry.outAmPm || 'PM',
-//           hours: entry.totalHours?.toFixed(2) || '-',
-//           salary: entry.salary?.toFixed(2) || '',
-//           isLeave: entry.leave,
-//           rate: entry.rate || '',
-//         };
-//       } else {
-//         return {
-//           inTime: '',
-//           inAmPm: 'AM',
-//           outTime: '',
-//           outAmPm: 'PM',
-//           hours: '-',
-//           salary: '',
-//           isLeave: true,
-//           rate: '',
-//         };
-//       }
-//     });
-
-//     setTimeEntries(updatedEntries);
-
-//     // Restore the first valid rate found
-//     const firstRate = data.find((e) => e.rate && e.rate > 0)?.rate || '';
-//     setRate(String(firstRate));
-//   } catch (error) {
-//     console.error('Load error:', error);
-//     Alert.alert('Error', 'Failed to load entries from backend.');
-//   }
-// };
 
 export const loadFromBackend = async (setTimeEntries, setRate) => {
   try {
@@ -214,8 +57,12 @@ export const loadFromBackend = async (setTimeEntries, setRate) => {
           inAmPm: entry.inAmPm || 'AM',
           outTime: entry.outTime || '',
           outAmPm: entry.outAmPm || 'PM',
-          hours: entry.totalHours != null ? entry.totalHours.toFixed(2) : '-', // also fix hours
-          salary: entry.salary != null ? entry.salary.toFixed(2) : '',        // ✅ fixed salary restore
+          hours: entry.totalHours !== undefined && entry.totalHours !== null
+            ? Number(entry.totalHours).toFixed(2)
+            : '-',
+          salary: entry.salary !== undefined && entry.salary !== null
+            ? Number(entry.salary).toFixed(2)   // ✅ FIXED
+            : '',
           isLeave: entry.leave,
           rate: entry.rate || '',
         };

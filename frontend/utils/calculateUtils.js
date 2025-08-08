@@ -1,3 +1,6 @@
+
+
+
 /**
  * Converts 12-hour time with AM/PM into decimal hours
  */
@@ -37,24 +40,31 @@ export const calculateSalary = (workedHours, rate, isLeave) => {
 
 /**
  * Recalculates totalHours and salary for a list of entries
+ * Returns SAME array reference if nothing changes (prevents state flicker)
  */
 export const recalculateEntries = (entries, rate) => {
-  return entries.map((entry) => {
-    const { inTime, inAmPm, outTime, outAmPm, leave } = entry;
+  let hasChanged = false;
+
+  const updatedEntries = entries.map((entry) => {
+    const { inTime, inAmPm, outTime, outAmPm, leave, totalHours, salary } = entry;
 
     if (inTime && outTime) {
       const workedHours = calculateWorkedHours(inTime, inAmPm, outTime, outAmPm);
-      const salary = calculateSalary(workedHours, rate, leave);
-      return {
-        ...entry,
-        totalHours: workedHours,
-        salary,
-      };
+      const newSalary = calculateSalary(workedHours, rate, leave);
+
+      if (workedHours !== totalHours || newSalary !== salary) {
+        hasChanged = true;
+        return { ...entry, totalHours: workedHours, salary: newSalary };
+      }
+      return entry;
     }
-    return {
-      ...entry,
-      totalHours: 0,
-      salary: 0,
-    };
+
+    if (totalHours !== 0 || salary !== 0) {
+      hasChanged = true;
+      return { ...entry, totalHours: 0, salary: 0 };
+    }
+    return entry;
   });
+
+  return hasChanged ? updatedEntries : entries;
 };
